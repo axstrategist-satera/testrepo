@@ -3,104 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ランダム数字ボタン</title>
+    <title>プレミアム ランダム数字ジェネレーター</title>
+    <meta name="description" content="洗練されたデザインとスムーズなアニメーションを備えた高機能ランダム数字ジェネレーター。">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --card-bg: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --accent-glow: rgba(168, 85, 247, 0.35);
+            --history-chip-bg: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.15);
+        }
+
+        [data-theme="light"] {
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #fce7f3 100%);
+            --card-bg: rgba(255, 255, 255, 0.65);
+            --card-border: rgba(255, 255, 255, 0.8);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #9333ea 50%, #db2777 100%);
+            --accent-glow: rgba(147, 51, 234, 0.25);
+            --history-chip-bg: rgba(0, 0, 0, 0.05);
+            --input-bg: rgba(0, 0, 0, 0.03);
+            --shadow-card: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 0 30px rgba(147, 51, 234, 0.1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--bg-gradient);
+            background-size: 200% 200%;
+            animation: gradientMove 15s ease infinite;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 浮遊する背景装飾円 */
+        .ambient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: #6366f1;
+            top: 10%;
+            left: 15%;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 250px;
+            height: 250px;
+            background: #ec4899;
+            bottom: 10%;
+            right: 15%;
+            animation: float 10s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-30px) scale(1.1); }
         }
 
         .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            padding: 40px 32px;
+            box-shadow: var(--shadow-card);
             text-align: center;
-            background: white;
-            padding: 50px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 6px 12px;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 90%;
+            background: var(--input-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 28px;
-        }
-
-        .number-display {
-            font-size: 72px;
-            font-weight: bold;
-            color: #667eea;
-            margin: 30px 0;
-            min-height: 90px;
+        .theme-toggle {
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: scale(0.5);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            font-size: 1.1rem;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.08);
         }
 
-        button:hover {
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 28px;
+        }
+
+        /* 数値表示セクション */
+        .display-card {
+            position: relative;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 32px 16px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .number-display {
+            font-family: 'Outfit', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            filter: drop-shadow(0 4px 12px var(--accent-glow));
+        }
+
+        .number-display.pop {
+            animation: popAnim 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popAnim {
+            0% { transform: scale(0.6); opacity: 0.3; }
+            70% { transform: scale(1.12); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: color 0.2s, background-color 0.2s;
+        }
+        .copy-btn:hover {
+            color: var(--text-main);
+            background: var(--history-chip-bg);
+        }
+
+        /* 範囲設定フォーム */
+        .range-inputs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .input-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-weight: 600;
+            outline: none;
+            text-align: center;
+        }
+        .input-group input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        /* メイン生成ボタン */
+        .generate-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: var(--accent-gradient);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 25px var(--accent-glow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .generate-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 12px 30px var(--accent-glow);
+        }
+        .generate-btn:active {
+            transform: translateY(1px);
         }
 
-        button:active {
-            transform: translateY(0);
+        /* 生成履歴 */
+        .history-section {
+            margin-top: 28px;
+            text-align: left;
+        }
+        .history-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .history-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            min-height: 32px;
+        }
+        .chip {
+            background: var(--history-chip-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
         }
 
-        .info {
-            color: #999;
-            font-size: 14px;
-            margin-top: 20px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* トースト通知 */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(15, 23, 42, 0.9);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎲 ランダム数字</h1>
-        <div class="number-display" id="numberDisplay">-</div>
-        <button onclick="generateRandomNumber()">ボタンをクリック</button>
-        <p class="info">1～100のランダムな数字が表示されます</p>
-    </div>
+    <!-- 浮遊オーブ背景 -->
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+
+    <main class="container">
+        <div class="top-bar">
+            <span class="badge">PRO EDITION</span>
+            <button class="theme-toggle" id="themeToggle" aria-label="テーマ切り替え">🌙</button>
+        </div>
+
+        <h1>ランダム数字</h1>
+        <p class="subtitle">ワンタップで瞬時に高精度なランダム数値を生成</p>
+
+        <div class="display-card">
+            <button class="copy-btn" id="copyBtn" title="クリップボードにコピー" aria-label="コピー">📋</button>
+            <div class="number-display" id="numberDisplay">-</div>
+        </div>
+
+        <div class="range-inputs">
+            <div class="input-group">
+                <label for="minVal">最小値</label>
+                <input type="number" id="minVal" value="1" min="-999999" max="999999">
+            </div>
+            <div class="input-group">
+                <label for="maxVal">最大値</label>
+                <input type="number" id="maxVal" value="100" min="-999999" max="999999">
+            </div>
+        </div>
+
+        <button class="generate-btn" onclick="generateRandomNumber()">🎲 数字を生成する</button>
+
+        <div class="history-section">
+            <div class="history-title">最近の履歴</div>
+            <div class="history-chips" id="historyChips">
+                <span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 400;">まだ履歴はありません</span>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast">コピーしました！</div>
 
     <script>
+        const history = [];
+
         function generateRandomNumber() {
-            const randomNum = Math.floor(Math.random() * 100) + 1;
+            const minInput = document.getElementById('minVal');
+            const maxInput = document.getElementById('maxVal');
+            let min = parseInt(minInput.value, 10);
+            let max = parseInt(maxInput.value, 10);
+
+            if (isNaN(min)) min = 1;
+            if (isNaN(max)) max = 100;
+
+            if (min > max) {
+                const temp = min;
+                min = max;
+                max = temp;
+                minInput.value = min;
+                maxInput.value = max;
+            }
+
+            const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
             const display = document.getElementById('numberDisplay');
-            display.textContent = randomNum;
+
+            display.classList.remove('pop');
+            void display.offsetWidth; // リフロー発生によるアニメーション再トリガー
+            display.textContent = randomNum.toLocaleString();
+            display.classList.add('pop');
+
+            addHistory(randomNum);
         }
+
+        function addHistory(num) {
+            history.unshift(num);
+            if (history.length > 5) history.pop();
+
+            const chipsContainer = document.getElementById('historyChips');
+            chipsContainer.innerHTML = history.map(n => `<span class="chip">${n.toLocaleString()}</span>`).join('');
+        }
+
+        // クリップボードコピー機能
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const val = document.getElementById('numberDisplay').textContent;
+            if (val === '-') return;
+
+            navigator.clipboard.writeText(val.replace(/,/g, '')).then(() => {
+                showToast('クリップボードにコピーしました！');
+            }).catch(() => {
+                showToast('コピーに失敗しました');
+            });
+        });
+
+        // トースト通知表示
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // テーマ切り替え
+        const themeToggle = document.getElementById('themeToggle');
+        let currentTheme = localStorage.getItem('theme') || 'dark';
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                themeToggle.textContent = '🌙';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        applyTheme(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(currentTheme);
+        });
     </script>
 </body>
 </html>
